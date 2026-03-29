@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Supersim</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; }
+        iframe { border: none; width: 100%; height: 100%; display: none; }
+    </style>
+</head>
+<body>
+
+    <iframe id="main-view"></iframe>
+
+    <script>
+        const BASE_URL = ""; 
+        const FINAL_URL = BASE_URL + window.location.search;
+
+        const loadingPage = `data:text/html;base64,${btoa(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <iframe src="https://zombie22000.github.io/files/supersimalmost.html" name="test" title="vnc" allowfullscreen></iframe>
+</body>
+</html>
+        `)}`;
+
+        const errorPage = `data:text/html;base64,${btoa(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <iframe src="https://zombie22000.github.io/files/supersimalmost.html" name="test" title="vnc" allowfullscreen></iframe>
+</body>
+</html>
+        `)}`;
+
+        const display = document.getElementById('main-view');
+
+        async function checkAndLoad() {
+            display.src = loadingPage;
+            display.style.display = "block";
+
+            try {
+                // Pre-validate URL
+                new URL(FINAL_URL);
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+                // Ping the site
+                await fetch(FINAL_URL, { mode: 'no-cors', signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                // Success: Switch to actual site
+                display.src = FINAL_URL;
+
+            } catch (err) {
+                // Failure: Show the custom error page
+                display.src = errorPage;
+            }
+        }
+
+        checkAndLoad();
+    </script>
+</body>
+</html>
